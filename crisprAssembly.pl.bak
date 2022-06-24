@@ -47,8 +47,9 @@ printf(
 
 #print $projection[0]->seq;
 # prints "CTATATGAGTTGAGTTCATCTGG",
-#my $slice_38 = $slice_adaptor->fetch_by_region(
-#    qw/chromosome 13 31758155 317581771 1  GRCh38/);
+
+my $slice_38 = $slice_adaptor->fetch_by_region(
+    qw/chromosome 13 31758155 317581771 1  GRCh38/);
 
 #failing tests.
 #test to get crispr site from the old assembly.
@@ -75,7 +76,6 @@ ok( crispr_assembly() eq " slice on old assembly",
     "slice on old assembly required" );
 ok( crispr_assembly() eq " slice on new assembly",
     "slice on new assembly required" );
-
 ok( crispr_assembly() eq "not a match",           "multiple projection" );
 ok( crispr_assembly() eq "match",                 "single projection" );
 ok( crispr_assembly() eq "projection into slice", " test projection slice" );
