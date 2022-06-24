@@ -45,7 +45,7 @@ printf(
     $updated->end,             $updated->seq
 );
 
-#print $projection[0]->seq;
+print $updated->seq;
 # prints "CTATATGAGTTGAGTTCATCTGG",
 #my $slice_38 = $slice_adaptor->fetch_by_region(
 #    qw/chromosome 13 31758155 317581771 1  GRCh38/);
