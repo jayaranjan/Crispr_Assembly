@@ -82,6 +82,10 @@ my $seq_region = $slice->seq_region_name();
 my $start      = $slice->start();
 my $end        = $slice->end();
 my $strand     = $slice->strand();
-
+if (defined $coord_sys and $seq_region)
+{
 print "Slice: $coord_sys $seq_region $start-$end ($strand)\n";
-
+}
+else {
+print " The coordinates does not exist in GRCh37\n";
+}
