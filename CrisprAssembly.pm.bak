@@ -4,10 +4,8 @@ use Bio::EnsEMBL::Utils::Slice qw(split_Slices);
 use Data::Dumper;
 use Text::CSV qw ( csv );
 use Exporter qw (import);
-use Test::More tests => 5;
+use Test::More tests => 1;
 our @EXPORT_OK = qw ( check_crispr_assembly_input  Get_Coordinates);
-
-#sub Get_Coordinates {
 
 my $registry = 'Bio::EnsEMBL::Registry';
 $registry->load_registry_from_db(
@@ -70,65 +68,49 @@ foreach my $feature (@feature) {
 
 }
 
-my $coordinate_adaptor =
-  $registry->get_adaptor( 'Human', 'Core', 'CoordSystem' );
-my $coordinate = $coordinate_adaptor->fetch_by_name('chromosome');
-printf "Coordinate system: %s %s %s %s \n", $coordinate->name(),
-  $coordinate->version(), $coordinate->dbID(),
-  $coordinate->is_sequence_level();
+    my $coordinate_adaptor =
+      $registry->get_adaptor( 'Human', 'Core', 'CoordSystem' );
+    my $coordinate = $coordinate_adaptor->fetch_by_name('chromosome');
+    printf "Coordinate system: %s %s %s %s \n", $coordinate->name(),
+      $coordinate->version(), $coordinate->dbID(),
+      $coordinate->is_sequence_level();
 
-#sub Get_Coordinates {
-
-    #print $sequence, "Test seq\n";
-    $sequence = $slice->subseq( 100, 200 );
-    my $coord_sys  = $slice->coord_system()->name();
-    my $seq_region = $slice->seq_region_name();
-    my $start      = $slice->start();
-    my $end        = $slice->end();
-    my $strand     = $slice->strand();
+sub Get_Coordinates {
+#print $sequence, "Test seq\n";
+$sequence = $slice->subseq( 100, 200 );
+   my $coord_sys  = $slice->coord_system()->name();
+   my $seq_region = $slice->seq_region_name();
+   my $start      = $slice->start();
+   my $end        = $slice->end();
+   my $strand     = $slice->strand();
     print "GRCH38 Coordinates: $coord_sys $seq_region $start-$end ($strand)\n";
 
-    # return $coord_sys, $seq_region, $start, $end, $strand;
-#}
-
+# return $coord_sys, $seq_region, $start, $end, $strand;
+}
 # if ( defined $coord_sys) {
 #        print "Test 1 Slice: $coord_sys $seq_region $start-$end ($strand)\n";
-#ok (1,'the slice is defined');
-#   }
-#   else {
-#          print " ($coord_sys)Test t1 The coordinates does not exist in GRCh37\n";
-#ok(0);
+        #ok (1,'the slice is defined');
+ #   }
+  #   else {
+   #          print " ($coord_sys)Test t1 The coordinates does not exist in GRCh37\n";
+   #ok(0);
 # }
-if ($updated->seq =~ m[CTAACCCTTTCAGGTCTAAATGG])  
-{ 
-    print "Test Pass : CRISPR Sequence Match \n"; 
-} 
-else 
-{ 
-    print "Test Failed : CRISPR Sequence Match \n"; 
-}
 sub check_crispr_assembly_input {
     my ( $old_crispr, $new_crispr ) = @_;
-
     #my $new_crispr = $updated->seq;
     if ( !$old_crispr ) {
         return "GRCH38 output required";
     }
     if ( !$new_crispr ) {
         return "GRCH37 output required";
-    }
+}    
 }
 
 1;
 
-
-#ok( defined Get_Coordinates($coord_sys), 'The coordinates are defined' );
-ok( defined $slice_adaptor, 'To test if GRCh37 slice is defined' );
-ok( defined $slice, 'To test if GRCH38 coordinates is defined' );
-ok( defined $updated->seq, 'The GRCH37 sequence projection' );
-ok( defined $coord_sys, 'The coordinates are defined' );
-ok (defined $seq_region, 'Test sequence region input');
-ok (defined $start, 'Test slice start input');
-ok (defined $end, 'Test slice end input');
-ok (defined $strand, 'Test slice strand input');
-ok($updated->seq =~ m[CTAACCCTTTCAGGTCTAAATGG],'crispr test');
+#ok (defined $updated->seq, 'projection of new sequence');
+ok (defined Get_Coordinates( $coord_sys), 'The coordinates are defined');
+#ok (defined Get_Coordinates($seq_region), 'Test sequence region input');
+#ok (defined Get_Coordinates($start), 'Test slice start input');
+#ok (defined Get_Coordinates($end), 'Test slice end input');
+#ok (defined Get_Coordinates($strand), 'Test slice strand input');
