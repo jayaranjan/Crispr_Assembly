@@ -1,13 +1,13 @@
 use FindBin;
 use lib "$FindBin::Bin";
-use CrisprAssembly qw( check_crispr_assembly_input Get_Coordinates);
+use CrisprAssembly qw (get_grch38_slice projection  Get_Coordinates check_crispr_assembly_input);
 use strict;
 use warnings;
 use Test::More tests => 9;
  #failing tests.
  #test to get crispr site from the old assembly
-ok( check_crispr_assembly_input() eq "GRCH38 output required",
-    "GRCH38  crispr output required" );
+##ok( check_crispr_assembly_input() eq "GRCH38 output required",
+##    "GRCH38  crispr output required" );
 #ok( check_crispr_assembly_input() eq "GRCH38 output required",
  #   "GRCH37 crispr assembly output required" );
 #ok( check_crispr_assembly_input() eq " slice on old assembly",
@@ -32,11 +32,15 @@ ok( check_crispr_assembly_input() eq "GRCH38 output required",
 # }
 # ok (defined $coord_sys, 'The coordinates are defined');
 
+ok( get_grch38_slice("32315474") eq "32315474", 'Test gene slice start '); 
 
-ok (defined $updated->seq, 'projection of new sequence');
- ok (defined Get_Coordinates( $coord_sys), 'The coordinates are defined');
-  ok (defined Get_Coordinates($seq_region), 'Test sequence region input');
- ok (defined Get_Coordinates($start), 'Test slice start input');
- ok (defined Get_Coordinates($end), 'Test slice end input');
-ok (defined Get_Coordinates($strand), 'Test slice strand input');
-    
+is( check_crispr_assembly_input(), "GRCH38 output required", "DNA sequence required", );
+#ok (defined ensembl_api $gene, 'To test if gene gets the input');
+#ok (defined projection $updated, 'To test projection input');
+#ok (defined $updated->seq, 'projection of new sequence');
+#ok (defined Get_Coordinates( $coord_sys), 'The coordinates are defined');
+#ok (defined Get_Coordinates($seq_region), 'Test sequence region input');
+#ok (defined Get_Coordinates($start), 'Test slice start input');
+#ok (defined Get_Coordinates($end), 'Test slice end input');
+#ok (defined Get_Coordinates($strand), 'Test slice strand input');
+##    
