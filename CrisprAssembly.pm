@@ -4,22 +4,24 @@ use Bio::EnsEMBL::Utils::Slice qw(split_Slices);
 use Data::Dumper;
 use Text::CSV qw ( csv );
 use Exporter qw (import);
-use Test::More tests => 5;
-our @EXPORT_OK = qw (get_grch38_slice projection  Get_Coordinates check_crispr_assembly_input);
+
+our @EXPORT_OK = qw ( grch38_slice projection update_projection get_coordinates check_crispr_assembly_input);
 
     my $registry = 'Bio::EnsEMBL::Registry';
        $registry->load_registry_from_db(
-        -host => 'ensembldb.ensembl.org',  #alternatively 'useastdb.ensembl.org'
+        -host => 'ensembldb.ensembl.org',   #alternatively 'useastdb.ensembl.org'
         -user => 'anonymous',
         -port => 3337);
+
     my $slice_adaptor = $registry->get_adaptor(qw/Human core slice/);
     my $slice = $slice_adaptor->fetch_by_region(qw/chromosome 13 32332370 32332992 1  GRCh38/);
 
-sub get_grch38_slice {
-    my ( $slice_adaptor,$slice )= @_;  
-    #### To GET ALL THE GENE IN THE SLICE ####
+sub grch38_slice {
+    my $slice = shift;  
+                                            #To get all the gene from the slice#
     my @genes = @{ $slice->get_all_Genes() };
-    foreach my $gene (@genes) {
+     foreach my $gene (@genes) {
+        print "Gene ID: ", $gene->stable_id, "\n";
         printf( " In terms of slice: %d-%d (%+d)\n",
             $gene->start(), $gene->end(), $gene->strand() 
         );
@@ -30,13 +32,12 @@ sub get_grch38_slice {
             $gene->seq_region_strand()
         );
     }
-return $gene, $slice_adaptor,$slice;
+  return @genes;
 }
-
-get_grch38_slice($slice_adaptor,$slice);
+#grch38_slice($slice);
 
 sub projection {
-    my ($slice_adaptor,$slice) = @_;
+    my $slice = shift;
     my @projection = @{ $slice->project(qw/chromosome GRCh37/) };
     my $len_projection = scalar @projection;
        if ( $len_projection > 1 ) {
@@ -48,10 +49,11 @@ sub projection {
         $updated->seq_region_name, $updated->start,
         $updated->end,             $updated->seq);
         print " \nGRCH38\n", $updated->seq, "\n";
+
     my @feature = @{ $slice->get_all_Genes() };
         foreach my $feature (@feature) {
         printf(
-            "Feature at: %s %d-%d (%+d) projects to\n",
+            "Projected slice Feature at GRCh37: %s %d-%d (%+d)\n",
             $feature->seq_region_name(), $feature->start(),
             $feature->end(),             $feature->strand());
     
@@ -59,52 +61,41 @@ sub projection {
         foreach my $segment ( @{$projection} ) {
     my $to_slice = $segment->to_Slice();
         printf(
-            "\t%s %d-%d (%+d)\n",
+            "  %s %d-%d (%+d)\n",
             $to_slice->seq_region_name(), $to_slice->start(),
             $to_slice->end(),             $to_slice->strand());
     }
   }
-return $updated;
+return $project,$updated;
 }
+#projection($slice);
 
-projection($slice_adaptor,$slice);
-#    my $coordinate_adaptor =
-#    $registry->get_adaptor( 'Human', 'Core', 'CoordSystem' );
-#    my $coordinate = $coordinate_adaptor->fetch_by_name('chromosome');
-#        printf "Coordinate system: %s %s %s %s \n", $coordinate->name(),
-#        $coordinate->version(), $coordinate->dbID(),
-#        $coordinate->is_sequence_level();
-#}
 sub get_coordinates {
-    my ($slice_adaptor,$slice,$updated) = @_;
-    $sequence = $slice->subseq( 100, 200 );
-    my $coord_sys  = $slice->coord_system()->name();
-    my $seq_region = $slice->seq_region_name();
-    my $start      = $slice->start();
-    my $end        = $slice->end();
-    my $strand     = $slice->strand();
-#     print "GRCH38 Coordinates: $coord_sys $seq_region $start-$end ($strand)\n";
-      #  print "$updated->seq\n";
-     #return $coord_sys, $seq_region, $start, $end, $strand;
-    #}
+    my ($slice,$updated) = @_;
+   # $sequence = $slice->subseq( 100, 200 );
+    my $slice_grch38 = $slice; 
+    my $coord_sys  = $slice_grch38->coord_system()->name();
+    my $seq_region = $slice_grch38->seq_region_name();
+    my $start      = $slice_grch38->start();
+    my $end        = $slice_grch38->end();
+    my $strand     = $slice_grch38->strand();
+
          ## Undef Test ##
      if ( defined $coord_sys) {
             print "Test 1 Slice PASSED: $coord_sys $seq_region $start-$end ($strand)\n";
-   # ok (1,'the slice is defined');
       }
-   else {
+     else {
           print " Test 1 Slice FAILED: The coordinates does not exist in GRCh37\n";
-    #ok(0);
-     }
+      }
 #        if ($updated->seq =~ m[CTAACCCTTTCAGGTCTAAATGG]) {    
-#            print "Test Pass : CRISPR Sequence Match \n"; 
+#            print "Test 2 Pass : CRISPR Sequence Match \n"; 
 #        } 
 #        else {    
-#            print "Test Failed : CRISPR Sequence Match \n"; 
+#            print "Test 2 Failed : CRISPR Sequence Match \n"; 
 #        }
  return $coord_sys, $seq_region, $start, $end, $strand;   
    }
- get_coordinates($slice_adaptor,$slice,$updated);
+# get_coordinates($slice,$updated);
 
 sub check_crispr_assembly_input {
     my ( $old_crispr, $new_crispr ) = @_;
@@ -112,22 +103,8 @@ sub check_crispr_assembly_input {
         if ( !$old_crispr ) {
             return "GRCH38 output required";
         }
- #       if ( !$new_crispr ) {
-#            return "GRCH37 output required";
-#        }
-#    }
+        if ( !$new_crispr ) {
+            return "GRCH37 output required";
+        }
 }
 1;
-#
-ok($get_grch38_slice("") eq "?", 'Test gene slice start ');
-#is( check_crispr_assembly_input(), "GRCH38 output required", "DNA sequence required", );
-#ok( defined Get_Coordinates($coord_sys), 'The coordinates are defined' );
-#ok( defined $slice_adaptor, 'To test if GRCh37 slice is defined' );
-#ok( defined $slice, 'To test if GRCH38 coordinates is defined' );
-#ok( defined $updated->seq, 'The GRCH37 sequence projection' );
-#ok( defined $coord_sys, 'The coordinates are defined' );
-#ok (defined $seq_region, 'Test sequence region input');
-#ok (defined $start, 'Test slice start input');
-#ok (defined $end, 'Test slice end input');
-#ok (defined $strand, 'Test slice strand input');
-###ok(($updated->seq =~ m[CTAACCCTTTCAGGTCTAAATGG]),'crispr test');
