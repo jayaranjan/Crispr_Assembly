@@ -44,6 +44,11 @@ sub projection {
         die "number of projections greater than 1 ";
         }
     my $updated = $projection[0]->to_Slice();
+return @projection,$updated;
+}
+sub update_projection {
+    my $slice = shift;
+    my $updated = shift; 
         printf(
         "\n GRCh37 Coordinates: %s:%d-%d \nGRCH37\n%s \n",
         $updated->seq_region_name, $updated->start,
@@ -66,7 +71,7 @@ sub projection {
             $to_slice->end(),             $to_slice->strand());
     }
   }
-return $project,$updated;
+return $updated,@feature,$to_slice;
 }
 #projection($slice);
 

@@ -18,7 +18,7 @@ my $gene_end = $gene->seq_region_end();
 my $gene_strand = $gene->seq_region_strand();
 my $gene_id =  $gene->stable_id;
 my $updated = &projection($slice);
-
+#my $updated = &update_projection($updated);
 my $coordinates_name = $updated->seq_region_name;
 my $coordinates_start = $updated->start;
 my $coordinates_end = $updated->end;
