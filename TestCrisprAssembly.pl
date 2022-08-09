@@ -1,6 +1,6 @@
 use FindBin;
 use lib "$FindBin::Bin";
-use CrisprAssembly qw ( grch38_slice projection update_projection get_coordinates check_crispr_assembly_input);
+use CrisprAssembly qw ( grch38_slice projection update_projection grch37_slice_feature get_coordinates check_crispr_assembly_input);
 use strict;
 use warnings;
 use Test::More tests => 18;

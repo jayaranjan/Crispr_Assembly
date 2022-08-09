@@ -5,7 +5,7 @@ use Data::Dumper;
 use Text::CSV qw ( csv );
 use Exporter qw (import);
 
-our @EXPORT_OK = qw ( grch38_slice projection update_projection get_coordinates check_crispr_assembly_input);
+our @EXPORT_OK = qw ( grch38_slice projection update_projection grch37_slice_feature get_coordinates check_crispr_assembly_input);
 
     my $registry = 'Bio::EnsEMBL::Registry';
        $registry->load_registry_from_db(
@@ -34,7 +34,6 @@ sub grch38_slice {
     }
   return @genes;
 }
-#grch38_slice($slice);
 
 sub projection {
     my $slice = shift;
@@ -44,8 +43,9 @@ sub projection {
         die "number of projections greater than 1 ";
         }
     my $updated = $projection[0]->to_Slice();
-return @projection,$updated;
+ return @projection,$updated;
 }
+
 sub update_projection {
     my $slice = shift;
     my $updated = shift; 
@@ -53,15 +53,20 @@ sub update_projection {
         "\n GRCh37 Coordinates: %s:%d-%d \nGRCH37\n%s \n",
         $updated->seq_region_name, $updated->start,
         $updated->end,             $updated->seq);
+
         print " \nGRCH38\n", $updated->seq, "\n";
 
+  return $updated,@feature,$to_slice;   
+}
+sub grch37_slice_feature {
+    my $slice = shift;
     my @feature = @{ $slice->get_all_Genes() };
         foreach my $feature (@feature) {
         printf(
             "Projected slice Feature at GRCh37: %s %d-%d (%+d)\n",
             $feature->seq_region_name(), $feature->start(),
             $feature->end(),             $feature->strand());
-    
+} 
     my $projection = $feature->project('clone');
         foreach my $segment ( @{$projection} ) {
     my $to_slice = $segment->to_Slice();
@@ -69,11 +74,9 @@ sub update_projection {
             "  %s %d-%d (%+d)\n",
             $to_slice->seq_region_name(), $to_slice->start(),
             $to_slice->end(),             $to_slice->strand());
-    }
-  }
-return $updated,@feature,$to_slice;
+    }  
+ return $updated,@feature,$to_slice;
 }
-#projection($slice);
 
 sub get_coordinates {
     my ($slice,$updated) = @_;
@@ -98,9 +101,8 @@ sub get_coordinates {
 #        else {    
 #            print "Test 2 Failed : CRISPR Sequence Match \n"; 
 #        }
- return $coord_sys, $seq_region, $start, $end, $strand;   
-   }
-# get_coordinates($slice,$updated);
+   return $coord_sys, $seq_region, $start, $end, $strand;   
+}
 
 sub check_crispr_assembly_input {
     my ( $old_crispr, $new_crispr ) = @_;
@@ -113,3 +115,5 @@ sub check_crispr_assembly_input {
         }
 }
 1;
+
+__END__
