@@ -7,8 +7,8 @@ use Test::More tests => 18;
  
 my $registry = 'Bio::EnsEMBL::Registry';
  $registry->load_registry_from_db(-host => 'ensembldb.ensembl.org', -user => 'anonymous', -port => 3337);
- my $slice_adaptor = $registry->get_adaptor(qw/Human core slice/);
-my $slice = $slice_adaptor->fetch_by_region(qw/chromosome 13 32332370 32332992 1  GRCh38/);
+ my $slice_adaptor = $registry->get_adaptor(qw/Human Core Slice/);
+my $slice = $slice_adaptor->fetch_by_region(qw/chromosome 13 32332370 32332992 1 GRCh38 /);
 my @projection = @{ $slice->project(qw/chromosome GRCh37/) };
  
 my @grch38_genes = &grch38_slice($slice);
@@ -17,8 +17,9 @@ my $gene_start = $gene->seq_region_start();
 my $gene_end = $gene->seq_region_end();
 my $gene_strand = $gene->seq_region_strand();
 my $gene_id =  $gene->stable_id;
+&update_projection("GRCh38", $slice);
 my $updated = &projection($slice);
-#my $updated = &update_projection($updated);
+&update_projection("GRCh37", $updated);
 my $coordinates_name = $updated->seq_region_name;
 my $coordinates_start = $updated->start;
 my $coordinates_end = $updated->end;

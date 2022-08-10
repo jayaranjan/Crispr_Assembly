@@ -14,7 +14,7 @@ our @EXPORT_OK = qw ( grch38_slice projection update_projection grch37_slice_fea
         -port => 3337);
 
     my $slice_adaptor = $registry->get_adaptor(qw/Human core slice/);
-    my $slice = $slice_adaptor->fetch_by_region(qw/chromosome 13 32332370 32332992 1  GRCh38/);
+    my $slice = $slice_adaptor->fetch_by_region(qw/chromosome 13 32332370 32332992 1 GRCh38/);
 
 sub grch38_slice {
     my $slice = shift;  
@@ -43,21 +43,20 @@ sub projection {
         die "number of projections greater than 1 ";
         }
     my $updated = $projection[0]->to_Slice();
- return @projection,$updated;
+ #return @projection,$updated;
 }
 
 sub update_projection {
-    my $slice = shift;
-    my $updated = shift; 
+    my $assembly = shift;
+    my $updated = shift;  
         printf(
-        "\n GRCh37 Coordinates: %s:%d-%d \nGRCH37\n%s \n",
+        "\n " . $assembly . " Coordinates: %s:%d-%d \n%s \n",
         $updated->seq_region_name, $updated->start,
         $updated->end,             $updated->seq);
 
-        print " \nGRCH38\n", $updated->seq, "\n";
-
-  return $updated,@feature,$to_slice;   
+  return $updated;   
 }
+#update_projection ($updated);
 sub grch37_slice_feature {
     my $slice = shift;
     my @feature = @{ $slice->get_all_Genes() };
