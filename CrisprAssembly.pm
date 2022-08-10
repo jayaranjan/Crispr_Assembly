@@ -5,16 +5,7 @@ use Data::Dumper;
 use Text::CSV qw ( csv );
 use Exporter qw (import);
 
-our @EXPORT_OK = qw ( grch38_slice projection update_projection grch37_slice_feature get_coordinates check_crispr_assembly_input);
-
-    my $registry = 'Bio::EnsEMBL::Registry';
-       $registry->load_registry_from_db(
-        -host => 'ensembldb.ensembl.org',   #alternatively 'useastdb.ensembl.org'
-        -user => 'anonymous',
-        -port => 3337);
-
-    my $slice_adaptor = $registry->get_adaptor(qw/Human core slice/);
-    my $slice = $slice_adaptor->fetch_by_region(qw/chromosome 13 32332370 32332992 1 GRCh38/);
+our @EXPORT_OK = qw ( grch38_slice projection print_projection grch37_slice_feature get_coordinates check_crispr_assembly_input);
 
 sub grch38_slice {
     my $slice = shift;  
@@ -46,7 +37,7 @@ sub projection {
  #return @projection,$updated;
 }
 
-sub update_projection {
+sub print_projection {
     my $assembly = shift;
     my $updated = shift;  
         printf(
@@ -56,7 +47,7 @@ sub update_projection {
 
   return $updated;   
 }
-#update_projection ($updated);
+
 sub grch37_slice_feature {
     my $slice = shift;
     my @feature = @{ $slice->get_all_Genes() };
@@ -74,7 +65,7 @@ sub grch37_slice_feature {
             $to_slice->seq_region_name(), $to_slice->start(),
             $to_slice->end(),             $to_slice->strand());
     }  
- return $updated,@feature,$to_slice;
+ return $slice,@feature,$to_slice;
 }
 
 sub get_coordinates {
@@ -94,18 +85,11 @@ sub get_coordinates {
      else {
           print " Test 1 Slice FAILED: The coordinates does not exist in GRCh37\n";
       }
-#        if ($updated->seq =~ m[CTAACCCTTTCAGGTCTAAATGG]) {    
-#            print "Test 2 Pass : CRISPR Sequence Match \n"; 
-#        } 
-#        else {    
-#            print "Test 2 Failed : CRISPR Sequence Match \n"; 
-#        }
    return $coord_sys, $seq_region, $start, $end, $strand;   
 }
 
 sub check_crispr_assembly_input {
     my ( $old_crispr, $new_crispr ) = @_;
-    #my $new_crispr = $updated->seq;
         if ( !$old_crispr ) {
             return "GRCH38 output required";
         }
