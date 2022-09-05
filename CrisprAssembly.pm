@@ -4,15 +4,17 @@ use Bio::EnsEMBL::Utils::Slice qw(split_Slices);
 use Data::Dumper;
 use Text::CSV qw ( csv );
 use Exporter qw (import);
-
-our @EXPORT_OK = qw ( grch38_slice projection print_projection grch37_slice_feature get_coordinates check_crispr_assembly_input);
+use REST::Client;
+use JSON;
+use Data::Dumper;
+our @EXPORT_OK = qw ( grch38_slice pass_crispr_id fetch_crispr projection print_projection grch37_slice_feature get_coordinates check_crispr_assembly_input);
 
 sub grch38_slice {
     my $slice = shift;  
                                             #To get all the gene from the slice#
     my @genes = @{ $slice->get_all_Genes() };
      foreach my $gene (@genes) {
-        print "Gene ID: ", $gene->stable_id, "\n";
+        print "\nGene ID: ", $gene->stable_id, "\n";
         printf( " In terms of slice: %d-%d (%+d)\n",
             $gene->start(), $gene->end(), $gene->strand() 
         );
@@ -26,6 +28,23 @@ sub grch38_slice {
   return @genes;
 }
 
+sub pass_crispr_id {
+    #my $crispr_id = shift;
+    my ($crispr_id1,$crispr_id2)=@_;
+    my $crispr_counter = 1;
+    print "Number of crispr id input ", $crispr_id, "\n";
+    foreach my $crispr(@ARGV) {    
+        print "Crispr ID # $crispr_counter : $crispr\n";  
+        $crispr_counter++;
+    }
+}
+
+sub fetch_crispr {
+     my $client = shift;
+       print "\nCrispr Sequence By ID\n",$client->responseContent(),"\n";
+    my $response = from_json($client->responseContent());
+}
+
 sub projection {
     my $slice = shift;
     my @projection = @{ $slice->project(qw/chromosome GRCh37/) };
@@ -34,7 +53,7 @@ sub projection {
         die "number of projections greater than 1 ";
         }
     my $updated = $projection[0]->to_Slice();
- #return @projection,$updated;
+    #return @projection,$updated;
 }
 
 sub print_projection {
@@ -56,7 +75,7 @@ sub grch37_slice_feature {
             "Projected slice Feature at GRCh37: %s %d-%d (%+d)\n",
             $feature->seq_region_name(), $feature->start(),
             $feature->end(),             $feature->strand());
-} 
+    } 
     my $projection = $feature->project('clone');
         foreach my $segment ( @{$projection} ) {
     my $to_slice = $segment->to_Slice();
