@@ -1,23 +1,28 @@
 use FindBin;
 use lib "$FindBin::Bin";
-use CrisprAssembly qw ( grch38_slice pass_crispr_id fetch_crispr projection print_projection grch37_slice_feature get_coordinates check_crispr_assembly_input);
+use CrisprAssembly qw ( grch38_slice pass_crispr_id tolist fetch_crispr projection print_projection grch37_slice_feature get_coordinates check_crispr_assembly_input);
 use strict;
 use warnings;
 use Test::More tests => 18;
- 
+use JSON;
+use Data::Dumper; 
 my $registry = 'Bio::EnsEMBL::Registry';
- $registry->load_registry_from_db(-host => 'ensembldb.ensembl.org', -user => 'anonymous');
- my $slice_adaptor = $registry->get_adaptor(qw/human core slice/);
+   $registry->load_registry_from_db(-host => 'ensembldb.ensembl.org', -user => 'anonymous');
+my $slice_adaptor = $registry->get_adaptor(qw/human core slice/);
+# the slice have to get coordinates from multiple crisper ids and out put the infromation about the seq (use for loop )or (if else).
 my $slice = $slice_adaptor->fetch_by_region(qw/chromosome 13 32332370 32332992 1 GRCh38 /);
-#my $crispr_id = $ARGV[0];
-# my $crispr_id = $#ARGV + 1;
+#my $char_name = &fetch_crispr($char_name);
+#my $char_start = &fetch_crispr($char_start);
+#my $char_end= &fetch_crispr($char_end);
+#my $pam_right = &fetch_crispr($pam_right);
+#my $slice = ( $char_name, $char_start, $char_end, $pam_right );
 my ($crispr_id_1, $crispr_id_2) = @ARGV;
-#&pass_crispr_id($crispr_id);
-&pass_crispr_id($crispr_id_1,$crispr_id_2);
+    &pass_crispr_id ($crispr_id_1,$crispr_id_2);
+#&fetch_crispr($crispr_id_1);
 my $client = REST::Client->new();
-$client->GET('https://wge.stemcell.sanger.ac.uk/api/crispr_by_id?species=Grch38&id='.$crispr_id_1.'&id='.$crispr_id_2.'');
-&fetch_crispr($client);
-#&fetch_crispr($crispr_id);
+   $client->GET('https://wge.stemcell.sanger.ac.uk/api/crispr_by_id?species=Grch38&id='.$crispr_id_1.'&id='.$crispr_id_2.'');
+    &fetch_crispr($client);
+   # &pass_crispr_id($client);
 my @projection = @{ $slice->project(qw/chromosome GRCh37/) };
 my @grch38_genes = &grch38_slice($slice);
 my $gene = $grch38_genes[0];
@@ -25,9 +30,9 @@ my $gene_start = $gene->seq_region_start();
 my $gene_end = $gene->seq_region_end();
 my $gene_strand = $gene->seq_region_strand();
 my $gene_id =  $gene->stable_id;
-&print_projection("GRCh38", $slice);
+    &print_projection("GRCh38", $slice);
 my $updated = &projection($slice);
-&print_projection("GRCh37", $updated);
+    &print_projection("GRCh37", $updated);
 my $coordinates_name = $updated->seq_region_name;
 my $coordinates_start = $updated->start;
 my $coordinates_end = $updated->end;
@@ -44,7 +49,7 @@ my $check_grch38_start = $slice->start();
 my $check_grch38_end = $slice->end();
 my $check_grch38_strand = $slice->strand();
 
- #failing tests.
+#failing tests.
 is ($gene_id, "ENSG00000139618",'Test Gene ID');
 is( $gene_start , "32315086", 'Test gene slice start '); 
 is( $gene_end , "32400268", 'Test gene slice end '); 
