@@ -1,6 +1,6 @@
 use FindBin;
 use lib "$FindBin::Bin";
-use CrisprAssembly qw ( grch38_slice pass_crispr_id tolist fetch_crispr projection print_projection grch37_slice_feature get_coordinates check_crispr_assembly_input);
+use CrisprAssembly qw ( grch38_slice pass_crispr_id fetch_crispr projection print_projection grch37_slice_feature get_coordinates check_crispr_assembly_input);
 use strict;
 use warnings;
 use Test::More tests => 18;
@@ -11,17 +11,12 @@ my $registry = 'Bio::EnsEMBL::Registry';
 my $slice_adaptor = $registry->get_adaptor(qw/human core slice/);
 # the slice have to get coordinates from multiple crisper ids and out put the infromation about the seq (use for loop )or (if else).
 my $slice = $slice_adaptor->fetch_by_region(qw/chromosome 13 32332370 32332992 1 GRCh38 /);
-#my $char_name = &fetch_crispr($char_name);
-#my $char_start = &fetch_crispr($char_start);
-#my $char_end= &fetch_crispr($char_end);
-#my $pam_right = &fetch_crispr($pam_right);
-#my $slice = ( $char_name, $char_start, $char_end, $pam_right );
 my ($crispr_id_1, $crispr_id_2) = @ARGV;
     &pass_crispr_id ($crispr_id_1,$crispr_id_2);
 #&fetch_crispr($crispr_id_1);
 my $client = REST::Client->new();
    $client->GET('https://wge.stemcell.sanger.ac.uk/api/crispr_by_id?species=Grch38&id='.$crispr_id_1.'&id='.$crispr_id_2.'');
-    &fetch_crispr($client);
+    &fetch_crispr($client, $crispr_id_1, $crispr_id_2);
    # &pass_crispr_id($client);
 my @projection = @{ $slice->project(qw/chromosome GRCh37/) };
 my @grch38_genes = &grch38_slice($slice);

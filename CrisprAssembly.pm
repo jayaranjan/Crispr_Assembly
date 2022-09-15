@@ -7,7 +7,7 @@ use Exporter qw (import);
 use REST::Client;
 use JSON;
 use Data::Dumper;
-our @EXPORT_OK = qw ( grch38_slice pass_crispr_id tolist fetch_crispr projection print_projection grch37_slice_feature get_coordinates check_crispr_assembly_input);
+our @EXPORT_OK = qw ( grch38_slice pass_crispr_id fetch_crispr projection print_projection grch37_slice_feature get_coordinates check_crispr_assembly_input);
 
 sub grch38_slice {
     my $slice = shift;  
@@ -28,48 +28,30 @@ sub grch38_slice {
   return @genes;
 }
 
-sub tolist {
-    my $data = shift;
-    my $key = shift;
-        if (ref (data->{$key}) eq 'ARRAY') {
-            $data->{$key};
-  }
-        elsif (ref($data->{$key}) eq 'HASH') {
-            [$data->{$key}];
-  }
-        else {
-                [];
-  }
-}
-
 sub pass_crispr_id {
-    #my $crispr_id = shift;
     my ($crispr_id_1,$crispr_id_2)=@_;
     my $crispr_counter = 1;
-    print "Number of crispr id input ", $crispr_id, "\n";
+        print "Number of crispr id input ", $crispr_id, "\n";
     foreach my $crispr(@ARGV) {    
         print "Crispr ID # $crispr_counter : $crispr\n";  
         $crispr_counter++;
     }
-#return crispr_id_1 , crispr_id_2;
 }
 
-
 sub fetch_crispr {
-    my $client = shift;
-#   my ($crispr_id_1,$crispr_id_2) = @_;
+    my ($client, $crispr_id_1, $crispr_id_2) = @_ ;
       # print "\nCrispr Sequence By ID\n",$client->responseContent(),"\n";
     my $response = from_json($client->responseContent());
         print Dumper ($response);
-    my $chr_name = tolist ($response -> {'chr_name'});
-    my $chr_start =  $response -> {'1106710999'}{'chr_start'};
-   #my $chr_start =  $response -> $crispr_id_1,{'chr_start'};
-    my $chr_end = $response-> {'1106710999'}{'chr_end'};
-    my $pam_right = tolist ($response -> {'pam_right'});
+foreach my $key (sort (keys %$response )) {
+    print $key, '=', $response{"chr_start"},"\n";
+}
+    my $chr_name =  $response -> {$crispr_id_1}{'chr_name'};
+    my $chr_start =  $response -> {$crispr_id_1}{'chr_start'};
+    my $chr_end = $response-> {$crispr_id_1}{'chr_end'};
+    my $pam_right= $response-> {$crispr_id_1}{'pam_right'};
         print "\n",$id,$char_name,"\n";
-        print Dumper ($chr_start);
-        print Dumper ($chr_end); 
- #return (char_name,char_start,char_end,pam_right);                   
+        print Dumper ($chr_name,$chr_start,$chr_end,$pam_right);
 }
 
 sub projection {
@@ -80,7 +62,6 @@ sub projection {
         die "number of projections greater than 1 ";
         }
     my $updated = $projection[0]->to_Slice();
- #return @projection,$updated;
 }
 
 sub print_projection {
